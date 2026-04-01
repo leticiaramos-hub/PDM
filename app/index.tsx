@@ -1,4 +1,4 @@
-import Botao from "@/components/Botao";
+import Botao from "@/componentes/Botao";
 import { useState } from "react";
 import { Button, FlatList, Text, TextInput, View } from "react-native";
 import { nextId } from "../util/geral";
@@ -48,7 +48,7 @@ export default function Index() {
       <View
         style={{
           flexDirection: 'row',
-          width: '100%'
+          width: '95%'
         }}
       >
         <TextInput
@@ -64,6 +64,7 @@ export default function Index() {
         <Button 
           title="+"
           onPress={ adiciona }
+          color="#1639a2"
         />
       </View>
       <FlatList
@@ -77,7 +78,7 @@ export default function Index() {
       <Botao
         title="Limpar lista"
         onPress={ () => setLista([])}
-        color="#0000ff"
+        color="#1639a2"
         textColor="#ffffff"
         style={{ fontWeight: 'bold' }}
       />

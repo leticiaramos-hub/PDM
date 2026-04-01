@@ -3,7 +3,7 @@ import { Pressable, Text } from "react-native";
 export default (props) => {
     let title = props.title || "Título";
     let onPress = props.onPress;
-    let color = props.color || '#73b05f';
+    let color = props.color || '#4a6db9';
     let textColor = props.textColor || '#000000';
     let style = props.style;
 
@@ -14,7 +14,7 @@ export default (props) => {
                 backgroundColor: color,
                 paddingVertical: 10,
                 paddingHorizontal: 30,
-                borderRadius: 18,
+                borderRadius: 20,
                 ...style
             }}
         >
