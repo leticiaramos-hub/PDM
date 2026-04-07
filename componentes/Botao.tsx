@@ -14,7 +14,7 @@ export default (props) => {
                 backgroundColor: color,
                 paddingVertical: 10,
                 paddingHorizontal: 30,
-                borderRadius: 20,
+                borderRadius: 18,
                 ...style
             }}
         >
