@@ -1,7 +1,8 @@
-import Botao from "@/components/Botao";
+//tela inicial
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useState } from "react";
 import { Button, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import Botao from "../componentes/Botao";
 import { nextId } from "../util/geral";
 
 export default function Index() {
@@ -85,6 +86,7 @@ export default function Index() {
         textColor="#ffffff"
         style={{ fontWeight: 'bold', marginBottom: 20}}
       />
+
     </View>
   );
 }
