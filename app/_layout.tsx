@@ -51,6 +51,15 @@ export default function RootLayout() {
           headerShown: false
         }}
       />
+
+        <Stack.Screen
+        name="dt-hr"
+        options={{
+          title: "Data e Hora",
+          headerShown: false
+        }}
+      />
+
     </Stack>
   );
 }
