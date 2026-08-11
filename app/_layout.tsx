@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
@@ -10,64 +11,34 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
-        name="cadastro"
+        name="(tabs)"
         options={{
-          title: "Cadastro",
-          headerShown: false
+          title: "Williane Nails",
+          headerLeft: () => (
+            <Ionicons 
+              name="sparkles-outline" 
+              size={20} 
+              color="#185fa5" 
+              style={{ marginRight: 5 }}
+            />
+          ),
+          headerRight: () => (
+            <>
+              <Ionicons
+                name="notifications-outline"
+                size={20}
+                color="#1a3a5c"
+                style={{ marginRight: 10 }}
+              />
+              <Ionicons
+                name="person-outline"
+                size={20}
+                color="#1a3a5c"
+              />
+            </>
+          ),
         }}
       />
-      <Stack.Screen
-        name="home"
-        options={{
-          title: "Início",
-          headerShown: false
-        }}
-      />
-      
-      <Stack.Screen
-        name="meus-agendamentos"
-        options={{
-          title: "Meus Agendamentos",
-          headerShown: false
-        }}
-      />
-      <Stack.Screen
-        name="confirmacao"
-        options={{
-          title: "Confirmação",
-          headerShown: false
-        }}
-      />
-      <Stack.Screen
-        name="servico"
-        options={{
-          title: "Serviço",
-          headerShown: false
-        }}
-      />
-
-        <Stack.Screen
-        name="dt-hr"
-        options={{
-          title: "Data e Hora",
-          headerShown: false
-        }}
-      />
-
-        <Stack.Screen 
-        name="perfil" 
-        options={{ 
-          headerShown: false
-        }} 
-      />
-
-              <Stack.Screen 
-        name="dadosUsuarios" 
-        options={{ 
-          headerShown: false
-        }} 
-      />
-
     </Stack>
   );
 }

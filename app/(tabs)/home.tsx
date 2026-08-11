@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StatusBar, Text, View } from "react-native";
 
 export default function Home() {
   const router = useRouter();
@@ -10,58 +10,17 @@ export default function Home() {
   const email = params.email as string;
 
   const servicos = [
-    { nome: "Alongamento", imagem: require("../img/alongamento.png") },
-    { nome: "Manutenção", imagem: require("../img/manutencao.png") },
-    { nome: "Esmaltação", imagem: require("../img/esmaltacao.png") },
-    { nome: "Banho em Gel", imagem: require("../img/banho-gel.png") },
-    { nome: "Blindagem", imagem: require("../img/blindagem.png") },
-    { nome: "Remoção", imagem: require("../img/remocao.png") },
+    { nome: "Alongamento", imagem: require("../../img/alongamento.png") },
+    { nome: "Manutenção", imagem: require("../../img/manutencao.png") },
+    { nome: "Esmaltação", imagem: require("../../img/esmaltacao.png") },
+    { nome: "Banho em Gel", imagem: require("../../img/banho-gel.png") },
+    { nome: "Blindagem", imagem: require("../../img/blindagem.png") },
+    { nome: "Remoção", imagem: require("../../img/remocao.png") },
   ];
 
   return (
     <View style={{ flex: 1, backgroundColor: "#c8d8ee" }}>
-  
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          backgroundColor: "#fff",
-          paddingHorizontal: 20,
-          paddingVertical: 14,
-        }}
-      >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-          <Ionicons
-            name="sparkles-outline"
-            size={20}
-            color="#185fa5"
-          />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "bold",
-              color: "#1a3a5c",
-            }}
-          >
-            Williane Nails
-          </Text>
-        </View>
-
-        <View style={{ flexDirection: "row", gap: 10 }}>
-          <Ionicons
-            name="notifications-outline"
-            size={20}
-            color="#1a3a5c"
-          />
-          <Ionicons
-            name="person-outline"
-            size={20}
-            color="#1a3a5c"
-          />
-        </View>
-      </View>
-
+      <StatusBar hidden={false} barStyle="dark-content" />
       <ScrollView
         style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
@@ -291,75 +250,7 @@ export default function Home() {
             </View>
           </View>
         </View>
-      </ScrollView>
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          backgroundColor: "#fff",
-          paddingVertical: 10,
-        }}
-      >
-        <View style={{ alignItems: "center" }}>
-          <Ionicons
-            name="home"
-            size={20}
-            color="#185fa5"
-          />
-          <Text
-            style={{
-              fontSize: 10,
-              color: "#185fa5",
-            }}
-          >
-            Início
-          </Text>
-        </View>
-
-        <Pressable
-          style={{ alignItems: "center" }}
-          //onPress={() => router.push("/meus-agendamentos")}
-        >
-          <Ionicons
-            name="calendar-outline"
-            size={20}
-            color="#aaa"
-          />
-          <Text
-            style={{
-              fontSize: 10,
-              color: "#aaa",
-            }}
-          >
-            Agenda
-          </Text>
-        </Pressable>
-
-        <Pressable
-          style={{ alignItems: "center" }}
-          onPress={() =>
-            router.push({
-              pathname: "/perfil",
-              params: { nome, email },
-            })
-          }
-        >
-          <Ionicons
-            name="person-outline"
-            size={20}
-            color="#aaa"
-          />
-          <Text
-            style={{
-              fontSize: 10,
-              color: "#aaa",
-            }}
-          >
-            Perfil
-          </Text>
-        </Pressable>
-      </View>
+      </ScrollView>      
     </View>
   );
 }
