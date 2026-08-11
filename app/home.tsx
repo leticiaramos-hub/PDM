@@ -1,10 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 
 export default function Home() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const nome = params.nome as string;
+  const email = params.email as string;
 
   const servicos = [
     { nome: "Alongamento", imagem: require("../img/alongamento.png") },
@@ -335,7 +338,12 @@ export default function Home() {
 
         <Pressable
           style={{ alignItems: "center" }}
-          onPress={() => router.push("/cadastro")}
+          onPress={() =>
+            router.push({
+              pathname: "/perfil",
+              params: { nome, email },
+            })
+          }
         >
           <Ionicons
             name="person-outline"

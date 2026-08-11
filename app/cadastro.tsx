@@ -33,7 +33,10 @@ function identificarCadastro() {
     Alert.alert("Atenção", "A senha deve ter pelo menos 6 caracteres.");
     return;
   }
-  router.push("/home");  // 👈 vai direto, sem Alert antes
+  router.push({
+    pathname: "/home",
+    params: { nome, email },
+  });
 }
     
   return (

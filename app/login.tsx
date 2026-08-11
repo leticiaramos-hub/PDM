@@ -7,15 +7,18 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  function identificarLogin() {
-    if (!email.trim() || !senha.trim()) {
-      Alert.alert("Atenção", "Preencha e-mail e senha.");
-      return;
-    }
-    router.replace("/home");
-  }
 
-  
+function identificarLogin() {
+  if (!email.trim() || !senha.trim()) {
+    Alert.alert("Atenção", "Preencha e-mail e senha.");
+    return;
+  }
+  router.replace({
+    pathname: "/home",
+    params: { email },
+  });
+}
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#a8c0e0" />
