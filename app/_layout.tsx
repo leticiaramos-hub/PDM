@@ -23,13 +23,7 @@ export default function RootLayout() {
           headerShown: false
         }}
       />
-      <Stack.Screen
-        name="agendamento"
-        options={{
-          title: "Agendamento",
-          headerShown: false
-        }}
-      />
+      
       <Stack.Screen
         name="meus-agendamentos"
         options={{
@@ -62,6 +56,13 @@ export default function RootLayout() {
 
         <Stack.Screen 
         name="perfil" 
+        options={{ 
+          headerShown: false
+        }} 
+      />
+
+              <Stack.Screen 
+        name="dadosUsuarios" 
         options={{ 
           headerShown: false
         }} 
