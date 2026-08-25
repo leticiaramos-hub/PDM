@@ -39,6 +39,12 @@ export default function RootLayout() {
           ),
         }}
       />
+      <Stack.Screen
+        name="cadastro"
+        options={{
+          headerShown: false
+        }}
+      />
     </Stack>
   );
 }

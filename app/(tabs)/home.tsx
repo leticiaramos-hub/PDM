@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { Image, Pressable, ScrollView, StatusBar, Text, View } from "react-native";
+import { Image, Linking, Pressable, ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
 
 export default function Home() {
   const router = useRouter();
@@ -178,76 +178,86 @@ export default function Home() {
               marginTop: 10,
             }}
           >
-            <View style={{ flex: 1 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 4,
-                }}
-              >
-                <Ionicons
-                  name="location-outline"
-                  size={13}
-                  color="#185fa5"
-                />
-                <Text
+            <TouchableOpacity
+              onPress={() => { Linking.openURL("https://maps.google.com/?q=Rua+José+Tomé+Filho+122,Pocinhos,PB") }}
+              style={{ flex: 1 }}
+            >
+              <View style={{ flex: 1 }}>
+                <View
                   style={{
-                    fontSize: 12,
-                    fontWeight: "600",
-                    color: "#185fa5",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 4,
                   }}
                 >
-                  Endereço
-                </Text>
-              </View>
+                  <Ionicons
+                    name="location-outline"
+                    size={13}
+                    color="#185fa5"
+                  />
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: "600",
+                      color: "#185fa5",
+                    }}
+                  >
+                    Endereço
+                  </Text>
+                </View>
 
-              <Text
-                style={{
-                  fontSize: 10.5,
-                  color: "#1a3a5c",
-                }}
-              >
-                Rua Cícero Tomé de Araújo, 122{"\n"}
-                Nova Brasília – Pocinhos, PB{"\n"}
-                CEP: 58150-000
-              </Text>
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 4,
-                }}
-              >
-                <Ionicons
-                  name="call-outline"
-                  size={13}
-                  color="#185fa5"
-                />
                 <Text
                   style={{
-                    fontSize: 12,
-                    fontWeight: "600",
-                    color: "#185fa5",
+                    fontSize: 10.5,
+                    color: "#1a3a5c",
                   }}
                 >
-                  Contato
+                  Rua Cícero Tomé de Araújo, 122{"\n"}
+                  Nova Brasília – Pocinhos, PB{"\n"}
+                  CEP: 58150-000
                 </Text>
               </View>
+            </TouchableOpacity>
 
-              <Text
-                style={{
-                  fontSize: 10.5,
-                  color: "#1a3a5c",
-                }}
-              >
-                (83) 9419-3560{"\n"}
-                willianefarias@gmail.com
-              </Text>
-            </View>
+            <TouchableOpacity
+              onPress={() => { Linking.openURL("https://wa.me/+5583994193560") }}
+              style={{ flex: 1 }}
+            >
+              <View style={{ flex: 1 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
+                  <Ionicons
+                    name="call-outline"
+                    size={13}
+                    color="#185fa5"
+                  />
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: "600",
+                      color: "#185fa5",
+                    }}
+                  >
+                    Contato
+                  </Text>
+                </View>
+
+                <Text
+                  style={{
+                    fontSize: 10.5,
+                    color: "#1a3a5c",
+                  }}
+                >
+                  (83) 9419-3560{"\n"}
+                  willianefarias@gmail.com
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>      

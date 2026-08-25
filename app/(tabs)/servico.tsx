@@ -91,13 +91,6 @@ export default function EscolhaServico() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#1a3a6b" />
 
-      <View style={styles.topBar}>
-        <Pressable onPress={() => router.replace("/home")} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={24} color="#1a3a5c" />
-        </Pressable>
-        <Text style={styles.topTitle}> Home </Text>
-      </View>
-
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}

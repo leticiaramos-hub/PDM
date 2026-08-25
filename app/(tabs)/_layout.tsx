@@ -19,7 +19,7 @@ export default () => {
                 }} 
             />
             <Tabs.Screen 
-                name="meus-agendamentos" 
+                name="servico" 
                 options={{ 
                     title: "Agenda",
                     tabBarIcon: ({ color, size, focused }) => (
@@ -28,7 +28,7 @@ export default () => {
                             size={size} 
                             color={color} 
                         />
-                    ),
+                    ),                    
                     headerShown: false
                 }} 
             />
