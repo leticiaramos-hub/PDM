@@ -1,4 +1,3 @@
-//cadastro cliente
 import React, { useState } from "react";
 import {
   View,
@@ -13,38 +12,68 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const APIKEY = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
+
 export default function Cadastro() {
   const router = useRouter();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [enviando, setEnviando] = useState(false); 
 
-function identificarCadastro() {
-  if (!nome.trim() || !email.trim() || !senha.trim()) {
-    Alert.alert("Atenção", "Preencha todos os campos.");
-    return;
-  }
-  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if (!emailValido) {
-    Alert.alert("Atenção", "Digite um e-mail válido.");
-    return;
-  }
-  if (senha.length < 6) {
-    Alert.alert("Atenção", "A senha deve ter pelo menos 6 caracteres.");
-    return;
-  }
-  router.push({
-    pathname: "/home",
-    params: { nome, email },
-  });
-}
-    
+  const identificarCadastro = async () => {
+    if (!nome.trim() || !email.trim() || !senha.trim()) {
+      Alert.alert("Atenção", "Preencha todos os campos.");
+      return;
+    }
+
+    setEnviando(true); 
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/cadastro`, {
+        method: 'POST',
+        headers: {
+          apikey: APIKEY,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation',
+        },
+        body: JSON.stringify({ 
+          nome, 
+          email, 
+          senha }),
+      });
+
+      console.log('Status da resposta:', response.status); 
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Erro detalhado:', errorText);
+        Alert.alert("Erro", `Falha no cadastro: ${response.status}`);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Cadastro realizado:', data);
+
+      router.push({
+        pathname: "/home",
+        params: { nome, email },
+      });
+
+    } catch (error) {
+      console.error("Erro ao cadastrar:", error);
+      Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+    } finally {
+      setEnviando(false); 
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#a8c0e0" />
 
       <View style={styles.container}>
-
         <View style={styles.iconeTopo}>
           <Ionicons name="person-outline" size={32} color="#1a3a5c" />
         </View>
@@ -56,7 +85,7 @@ function identificarCadastro() {
 
         <Text style={styles.titulo}>Criar uma conta</Text>
         <Text style={styles.subtitulo}>
-          Insira seu e-mail para se cadastrar no aplicativo
+          Insira seus dados para se cadastrar no aplicativo
         </Text>
 
         <TextInput
@@ -85,13 +114,14 @@ function identificarCadastro() {
         />
 
         <TouchableOpacity
-          style={styles.botao}
-          onPress={identificarCadastro}
-
+          style={[styles.botao, enviando && styles.botaoDesabilitado]}
+          onPress={() => identificarCadastro()}
+          disabled={enviando}
         >
-          <Text style={styles.botaoTexto}>Cadastrar</Text>
+          <Text style={styles.botaoTexto}>
+            {enviando ? "Cadastrando..." : "Cadastrar"}
+          </Text>
         </TouchableOpacity>
-
       </View>
     </SafeAreaView>
   );
@@ -160,6 +190,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     marginTop: 8,
+  },
+  botaoDesabilitado: {
+    opacity: 0.6,
   },
   botaoTexto: {
     color: "#fff",
