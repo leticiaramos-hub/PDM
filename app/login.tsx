@@ -14,7 +14,7 @@ function identificarLogin() {
     return;
   }
   router.replace({
-    pathname: "/home",
+    pathname: "/tabs/home",
     params: { email },
   });
 }

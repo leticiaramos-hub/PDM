@@ -88,7 +88,7 @@ export default function Home() {
                 paddingHorizontal: 22,
                 marginTop: 6,
               }}
-              onPress={() => router.push("/servico")}
+              onPress={() => router.push("/tabs/servico")}
             >
               <Text
                 style={{
@@ -134,7 +134,7 @@ export default function Home() {
                   marginBottom: 12,
                   alignItems: "center",
                 }}
-                onPress={() => router.push("/servico")}
+                onPress={() => router.push("/tabs/servico")}
               >
                 <View
                   style={{

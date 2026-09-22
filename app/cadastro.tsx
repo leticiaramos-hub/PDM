@@ -49,7 +49,7 @@ export default function Cadastro() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Erro detalhado:', errorText);
-        Alert.alert("Erro", `Falha no cadastro: ${response.status}`);
+        Alert.alert("Erro", `Falha no cadastro: ${errorText}`);
         return;
       }
 
@@ -57,7 +57,7 @@ export default function Cadastro() {
       console.log('Cadastro realizado:', data);
 
       router.push({
-        pathname: "/home",
+        pathname: "/tabs/home",
         params: { nome, email },
       });
 

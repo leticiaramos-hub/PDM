@@ -22,6 +22,7 @@ export default () => {
                 name="servico" 
                 options={{ 
                     title: "Agenda",
+                    href: null,
                     tabBarIcon: ({ color, size, focused }) => (
                         <Ionicons
                             name={focused ? 'calendar' : 'calendar-outline'} 

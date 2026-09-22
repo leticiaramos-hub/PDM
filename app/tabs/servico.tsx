@@ -156,7 +156,7 @@ export default function EscolhaServico() {
                 )}
               </View>
             );
-          })}
+          })} 
         </View>
 
         {/* SEÇÃO DE PAGAMENTO */}

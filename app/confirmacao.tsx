@@ -207,7 +207,7 @@ export default function Confirmacao() {
 
       <TouchableOpacity
         style={styles.botaoPrimario}
-        onPress={() => rota.push("/home" as any)}
+        onPress={() => rota.push("/tabs/home" as any)}
       >
         <Text style={styles.botaoPrimarioTexto}>
           Voltar ao Início

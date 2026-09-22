@@ -55,7 +55,7 @@ export default function DataHora() {
     <SafeAreaView style={styles.safeArea}>
 
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => rota.replace("/servico")} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => rota.replace("/tabs/servico")} style={styles.backBtn}>
           <Ionicons name="chevron-back" size={24} color="#1a3a5c" />
         </TouchableOpacity>
         <Text style={styles.topTitle}>Agendar Horário</Text>
