@@ -1,30 +1,76 @@
-import { useState } from "react";
-import { Alert, Pressable, Text, TextInput, View, SafeAreaView, StatusBar, StyleSheet } from "react-native";
-import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useState } from "react";
+import {
+  Alert,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { usuario } from "../util/usuario";
+
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const APIKEY = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
+  async function identificarLogin() {
+    if (!email.trim() || !senha.trim()) {
+      Alert.alert("Atenção", "Preencha e-mail e senha.");
+      return;
+    }
 
-function identificarLogin() {
-  if (!email.trim() || !senha.trim()) {
-    Alert.alert("Atenção", "Preencha e-mail e senha.");
-    return;
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+        {
+          method: "POST",
+          headers: {
+            apikey: APIKEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password: senha }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.error_code === "email_not_confirmed") {
+          Alert.alert("Atenção", "Confirme seu e-mail antes de entrar.");
+        } else {
+          Alert.alert("Erro", "E-mail ou senha incorretos.");
+        }
+        return;
+      }
+
+      const nome = data.user?.user_metadata?.nome;
+      usuario.nome = nome;
+      usuario.email = data.user.email;
+      usuario.id = data.user.id;
+      console.log("ID do usuário:", usuario.id);
+
+      router.replace({
+        pathname: "/",
+        params: { nome, email: data.user.email },
+      });
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+    }
   }
-  router.replace({
-    pathname: "/home",
-    params: { email },
-  });
-}
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#a8c0e0" />
 
       <View style={styles.container}>
-
         <View style={styles.iconeTopo}>
           <Ionicons name="person-outline" size={32} color="#1a3a5c" />
         </View>
@@ -61,7 +107,7 @@ function identificarLogin() {
         <Pressable
           style={({ pressed }) => [
             styles.botao,
-            { backgroundColor: pressed ? "#a9a9a9" : "#1a2e4a" }
+            { backgroundColor: pressed ? "#a9a9a9" : "#1a2e4a" },
           ]}
           onPress={identificarLogin}
         >
@@ -74,7 +120,6 @@ function identificarLogin() {
             <Text style={{ fontWeight: "bold" }}>Cadastre-se</Text>
           </Text>
         </Pressable>
-
       </View>
     </SafeAreaView>
   );
@@ -131,8 +176,8 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#fff",
     borderRadius: 10,
-    paddingHorizontal: 16,
     paddingVertical: 14,
+    paddingHorizontal: 16,
     fontSize: 14,
     color: "#1a2e4a",
   },

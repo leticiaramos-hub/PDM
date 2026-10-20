@@ -1,23 +1,56 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Alert,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 
 LocaleConfig.locales["pt-br"] = {
-  monthNames: ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],
-  monthNamesShort: ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],
-  dayNames: ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"],
-  dayNamesShort: ["Dom","Seg","Ter","Qua","Qui","Sex","Sab"],
+  monthNames: [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro",
+  ],
+  monthNamesShort: [
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez",
+  ],
+  dayNames: [
+    "Domingo",
+    "Segunda",
+    "Terça",
+    "Quarta",
+    "Quinta",
+    "Sexta",
+    "Sábado",
+  ],
+  dayNamesShort: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"],
   today: "Hoje",
 };
 
@@ -27,13 +60,13 @@ export default function DataHora() {
   const rota = useRouter();
   const params = useLocalSearchParams();
 
-  const servico = params.servico as string || "Não informado";
-  const pagamento = params.pagamento as string || "Não informado";
+  const servico = (params.servico as string) || "Não informado";
+  const pagamento = (params.pagamento as string) || "Não informado";
 
   const [dataSelecionada, setDataSelecionada] = useState("");
   const [horarioSelecionado, setHorarioSelecionado] = useState("");
 
-  const horarios = ["08:30","13:00","14:00"];
+  const horarios = ["08:30", "13:00", "14:00"];
 
   function continuar() {
     if (!dataSelecionada || !horarioSelecionado) {
@@ -53,14 +86,6 @@ export default function DataHora() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => rota.replace("/servico")} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={24} color="#1a3a5c" />
-        </TouchableOpacity>
-        <Text style={styles.topTitle}>Agendar Horário</Text>
-      </View>
-
       <ScrollView style={styles.container}>
         <View style={styles.accentBar} />
         <Text style={styles.titulo}>Data & Hora</Text>
@@ -98,14 +123,16 @@ export default function DataHora() {
               key={horario}
               style={[
                 styles.botaoHorario,
-                horarioSelecionado === horario && styles.botaoHorarioSelecionado,
+                horarioSelecionado === horario &&
+                  styles.botaoHorarioSelecionado,
               ]}
               onPress={() => setHorarioSelecionado(horario)}
             >
               <Text
                 style={[
                   styles.textoHorario,
-                  horarioSelecionado === horario && styles.textoHorarioSelecionado,
+                  horarioSelecionado === horario &&
+                    styles.textoHorarioSelecionado,
                 ]}
               >
                 {horario}
@@ -120,7 +147,6 @@ export default function DataHora() {
           <Text style={styles.textoProximo}>Próximo</Text>
         </TouchableOpacity>
       </View>
-
     </SafeAreaView>
   );
 }

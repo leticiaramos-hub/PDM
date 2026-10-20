@@ -5,13 +5,33 @@ import { useState } from "react";
 import {
   Alert,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const APIKEY = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
+
+
+type SubOpcao = {
+  id: string;
+  nome: string;
+  valor: number;
+};
+
+type ServicoItem = {
+  id: string;
+  nome: string;
+  descricao: string | null;
+  preco: number | null;
+  sub_opcoes: SubOpcao[] | null;
+  disponivel: boolean;
+};
+
 
 const SERVICOS = [
   {
@@ -47,9 +67,12 @@ const PAGAMENTOS = [
 ];
 
 export default function EscolhaServico() {
-  const [selecionado, setSelecionado] = useState<string | null>(null);
-  const [subSelecionado, setSubSelecionado] = useState<string | null>(null);
-  const [pagamento, setPagamento] = useState<string | null>(null);
+const [servicos, setServicos] = useState<ServicoItem[]>([]);
+const [carregando, setCarregando] = useState(true);
+
+const [selecionado, setSelecionado] = useState<string | null>(null);
+const [subSelecionado, setSubSelecionado] = useState<string | null>(null);
+const [pagamento, setPagamento] = useState<string | null>(null);
 
   function avancar() {
     if (!selecionado) {

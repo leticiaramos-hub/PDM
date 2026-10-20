@@ -1,13 +1,26 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
-import { Image, Linking, Pressable, ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Linking,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { usuario } from "../../util/usuario";
 
 export default function Home() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const nome = params.nome as string;
   const email = params.email as string;
+  if (nome) {
+    usuario.nome = nome;
+    usuario.email = email;
+  }
 
   const servicos = [
     { nome: "Alongamento", imagem: require("../../img/alongamento.png") },
@@ -21,10 +34,7 @@ export default function Home() {
   return (
     <View style={{ flex: 1, backgroundColor: "#c8d8ee" }}>
       <StatusBar hidden={false} barStyle="dark-content" />
-      <ScrollView
-        style={{ flex: 1 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <View
           style={{
             paddingHorizontal: 20,
@@ -179,7 +189,11 @@ export default function Home() {
             }}
           >
             <TouchableOpacity
-              onPress={() => { Linking.openURL("https://maps.google.com/?q=Rua+José+Tomé+Filho+122,Pocinhos,PB") }}
+              onPress={() => {
+                Linking.openURL(
+                  "https://maps.google.com/?q=Rua+José+Tomé+Filho+122,Pocinhos,PB",
+                );
+              }}
               style={{ flex: 1 }}
             >
               <View style={{ flex: 1 }}>
@@ -190,11 +204,7 @@ export default function Home() {
                     gap: 4,
                   }}
                 >
-                  <Ionicons
-                    name="location-outline"
-                    size={13}
-                    color="#185fa5"
-                  />
+                  <Ionicons name="location-outline" size={13} color="#185fa5" />
                   <Text
                     style={{
                       fontSize: 12,
@@ -220,7 +230,9 @@ export default function Home() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => { Linking.openURL("https://wa.me/+5583994193560") }}
+              onPress={() => {
+                Linking.openURL("https://wa.me/+5583994193560");
+              }}
               style={{ flex: 1 }}
             >
               <View style={{ flex: 1 }}>
@@ -231,11 +243,7 @@ export default function Home() {
                     gap: 4,
                   }}
                 >
-                  <Ionicons
-                    name="call-outline"
-                    size={13}
-                    color="#185fa5"
-                  />
+                  <Ionicons name="call-outline" size={13} color="#185fa5" />
                   <Text
                     style={{
                       fontSize: 12,
@@ -260,7 +268,7 @@ export default function Home() {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>      
+      </ScrollView>
     </View>
   );
 }

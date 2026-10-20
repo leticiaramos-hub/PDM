@@ -7,7 +7,7 @@ export default function RootLayout() {
       <Stack.Screen
         name="login"
         options={{
-          headerShown: false
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -15,10 +15,10 @@ export default function RootLayout() {
         options={{
           title: "Williane Nails",
           headerLeft: () => (
-            <Ionicons 
-              name="sparkles-outline" 
-              size={20} 
-              color="#185fa5" 
+            <Ionicons
+              name="sparkles-outline"
+              size={20}
+              color="#185fa5"
               style={{ marginRight: 5 }}
             />
           ),
@@ -30,19 +30,28 @@ export default function RootLayout() {
                 color="#1a3a5c"
                 style={{ marginRight: 10 }}
               />
-              <Ionicons
-                name="person-outline"
-                size={20}
-                color="#1a3a5c"
-              />
+              <Ionicons name="person-outline" size={20} color="#1a3a5c" />
             </>
           ),
+          headerShown: false,
         }}
       />
       <Stack.Screen
         name="cadastro"
         options={{
-          headerShown: false
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="dt-hr"
+        options={{
+          title: "Agendar Horário",
+        }}
+      />
+      <Stack.Screen
+        name="confirmacao"
+        options={{
+          title: "Confirmação",
         }}
       />
     </Stack>

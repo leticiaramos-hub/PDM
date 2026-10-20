@@ -1,6 +1,7 @@
 //perfil cliente
 import React, { useState, useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
+import { usuario } from "../../util/usuario";
 
 import {
   View,
@@ -61,6 +62,9 @@ const params = useLocalSearchParams();
     router.replace("/login");
   }
 
+  const nome = usuario.nome;
+  const email = usuario.email;
+
   return (
 
     <ScrollView style={styles.container}>
@@ -74,17 +78,17 @@ const params = useLocalSearchParams();
         <View style={styles.iconePerfil}>
 
           <Text style={styles.letraPerfil}>
-            {cliente.nome_completo.charAt(0).toUpperCase()}
+           {nome?.[0]?.toUpperCase()}
           </Text>
 
         </View>
 
         <Text style={styles.nome}>
-          {cliente.nome_completo}
+          {nome}
         </Text>
 
         <Text style={styles.email}>
-          {cliente.email}
+          {email}
         </Text>
 
       </View>
@@ -100,7 +104,7 @@ const params = useLocalSearchParams();
           />
 
           <Text style={styles.textoInfo}>
-            {cliente.email}
+            {email}
           </Text>
 
         </View>
