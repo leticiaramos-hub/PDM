@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { usuario } from "../util/usuario";
+=======
+import React, { useState } from "react";
+>>>>>>> 66b3337a201c255a29dd1460fc0179479721837d
 import {
   Alert,
   StatusBar,
@@ -16,12 +20,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const APIKEY = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
 
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const APIKEY = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
+
 export default function Cadastro() {
   const router = useRouter();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+<<<<<<< HEAD
   const [enviando, setEnviando] = useState(false);
+=======
+  const [enviando, setEnviando] = useState(false); 
+>>>>>>> 66b3337a201c255a29dd1460fc0179479721837d
 
   const identificarCadastro = async () => {
     if (!nome.trim() || !email.trim() || !senha.trim()) {
@@ -29,6 +40,7 @@ export default function Cadastro() {
       return;
     }
 
+<<<<<<< HEAD
     setEnviando(true);
 
     try {
@@ -53,11 +65,35 @@ export default function Cadastro() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Erro detalhado:", errorText);
+=======
+    setEnviando(true); 
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/cadastro`, {
+        method: 'POST',
+        headers: {
+          apikey: APIKEY,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation',
+        },
+        body: JSON.stringify({ 
+          nome, 
+          email, 
+          senha }),
+      });
+
+      console.log('Status da resposta:', response.status); 
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Erro detalhado:', errorText);
+>>>>>>> 66b3337a201c255a29dd1460fc0179479721837d
         Alert.alert("Erro", `Falha no cadastro: ${errorText}`);
         return;
       }
 
       const data = await response.json();
+<<<<<<< HEAD
       console.log("Cadastro realizado:", data);
 
       const user = data.user || data;
@@ -69,11 +105,24 @@ export default function Cadastro() {
         pathname: "/(tabs)/home",
         params: { nome, email },
       });
+=======
+      console.log('Cadastro realizado:', data);
+
+      router.push({
+        pathname: "/tabs/home",
+        params: { nome, email },
+      });
+
+>>>>>>> 66b3337a201c255a29dd1460fc0179479721837d
     } catch (error) {
       console.error("Erro ao cadastrar:", error);
       Alert.alert("Erro", "Não foi possível conectar ao servidor.");
     } finally {
+<<<<<<< HEAD
       setEnviando(false);
+=======
+      setEnviando(false); 
+>>>>>>> 66b3337a201c255a29dd1460fc0179479721837d
     }
   };
 

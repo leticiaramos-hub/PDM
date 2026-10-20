@@ -11,7 +11,7 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
-        name="(tabs)"
+        name="tabs"
         options={{
           title: "Williane Nails",
           headerLeft: () => (
@@ -52,6 +52,18 @@ export default function RootLayout() {
         name="confirmacao"
         options={{
           title: "Confirmação",
+        }}
+      />
+      <Stack.Screen
+        name="dt-hr"
+        options={{
+          headerShown: false
+        }}
+      />
+      <Stack.Screen
+        name="confirmacao"
+        options={{
+          headerShown: false
         }}
       />
     </Stack>

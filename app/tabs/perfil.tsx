@@ -12,6 +12,8 @@ import {
   TextInput,
 } from "react-native";
 
+//FAZER UM GET PUXANDO OS DADOS FORNECIDOS NO CADASTRO 
+
 import { Ionicons } from "@expo/vector-icons";
 
 type Perfil = {

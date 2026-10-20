@@ -179,7 +179,7 @@ const [pagamento, setPagamento] = useState<string | null>(null);
                 )}
               </View>
             );
-          })}
+          })} 
         </View>
 
         {/* SEÇÃO DE PAGAMENTO */}

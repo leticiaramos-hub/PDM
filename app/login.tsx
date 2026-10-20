@@ -65,6 +65,14 @@ export default function Login() {
       Alert.alert("Erro", "Não foi possível conectar ao servidor.");
     }
   }
+<<<<<<< HEAD
+=======
+  router.replace({
+    pathname: "/tabs/home",
+    params: { email },
+  });
+}
+>>>>>>> 66b3337a201c255a29dd1460fc0179479721837d
 
   return (
     <SafeAreaView style={styles.safeArea}>
