@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Alert,
@@ -16,50 +16,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const APIKEY = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
 
-
-type SubOpcao = {
-  id: string;
-  nome: string;
-  valor: number;
-};
-
-type ServicoItem = {
-  id: string;
-  nome: string;
-  descricao: string | null;
-  preco: number | null;
-  sub_opcoes: SubOpcao[] | null;
-  disponivel: boolean;
-};
-
-
-const SERVICOS = [
-  {
-    id: "manutencao",
-    nome: "Manutenção",
-    desc: "Retoques em unhas já feitas",
-    valor: "R$ 80,00",
-    subOpcoes: null,
-  },
-  {
-    id: "alongamento",
-    nome: "Alongamento",
-    desc: "Aplicação das unhas",
-    valor: null,
-    subOpcoes: [
-      { id: "fibra", nome: "Fibra de Vidro", valor: "R$ 130,00" },
-      { id: "tip", nome: "Tip", valor: "R$ 130,00" },
-    ],
-  },
-  {
-    id: "esmaltacao",
-    nome: "Esmaltação",
-    desc: "Esmalte em gel com secagem UV",
-    valor: "R$ 40,00",
-    subOpcoes: null,
-  },
-];
-
 const PAGAMENTOS = [
   { id: "pix", nome: "Pix", icone: "qr-code-outline" },
   { id: "cartao", nome: "Cartão", icone: "card-outline" },
@@ -67,12 +23,62 @@ const PAGAMENTOS = [
 ];
 
 export default function EscolhaServico() {
-const [servicos, setServicos] = useState<ServicoItem[]>([]);
-const [carregando, setCarregando] = useState(true);
+  const [servicos, setServicos] = useState<any[]>([]);
+  const [carregando, setCarregando] = useState(true);
 
-const [selecionado, setSelecionado] = useState<string | null>(null);
-const [subSelecionado, setSubSelecionado] = useState<string | null>(null);
-const [pagamento, setPagamento] = useState<string | null>(null);
+  const [selecionado, setSelecionado] = useState<string | null>(null);
+  const [subSelecionado, setSubSelecionado] = useState<string | null>(null);
+  const [pagamento, setPagamento] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function buscarServicos() {
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/servico?disponivel=eq.true&order=id`,
+          { headers: { apikey: APIKEY } },
+        );
+        const dados = await response.json();
+
+        const grupos: any = {};
+        dados.forEach((s: any) => {
+          const cat = s.categoria || s.nome;
+          if (!grupos[cat]) grupos[cat] = [];
+          grupos[cat].push(s);
+        });
+
+        const formatar = (v: any) =>
+          `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
+
+        const lista = Object.keys(grupos).map((cat) => {
+          const itens = grupos[cat];
+          const unico = itens.length === 1;
+          return {
+            id: cat,
+            nome: unico ? itens[0].nome : cat,
+            desc: itens[0].descricao || "",
+            valor: unico ? formatar(itens[0].valor) : null,
+            dbId: unico ? itens[0].id : null,
+            num: unico ? Number(itens[0].valor) : null,
+            subOpcoes: unico
+              ? null
+              : itens.map((i: any) => ({
+                  id: String(i.id),
+                  nome: i.nome,
+                  valor: formatar(i.valor),
+                  num: Number(i.valor),
+                })),
+          };
+        });
+
+        setServicos(lista);
+      } catch (error) {
+        console.error("Erro ao buscar serviços:", error);
+      } finally {
+        setCarregando(false);
+      }
+    }
+    buscarServicos();
+  }, []);
 
   function avancar() {
     if (!selecionado) {
@@ -80,7 +86,7 @@ const [pagamento, setPagamento] = useState<string | null>(null);
       return;
     }
 
-    const servico = SERVICOS.find((s) => s.id === selecionado);
+    const servico = servicos.find((s) => s.id === selecionado);
 
     if (servico?.subOpcoes && !subSelecionado) {
       Alert.alert("Atenção", "Selecione o tipo de alongamento.");
@@ -93,19 +99,26 @@ const [pagamento, setPagamento] = useState<string | null>(null);
     }
 
     let nomeServico = servico?.nome || "";
+    let servicoId = servico?.dbId;
+    let valorNum = servico?.num;
 
     if (servico?.subOpcoes) {
-      const sub = servico.subOpcoes.find((s) => s.id === subSelecionado);
+      const sub = servico.subOpcoes.find((s: any) => s.id === subSelecionado);
       nomeServico = `${servico.nome} - ${sub?.nome}`;
+      servicoId = sub?.id;
+      valorNum = sub?.num;
     }
 
-    const nomePagamento = PAGAMENTOS.find((p) => p.id === pagamento)?.nome || "";
+    const nomePagamento =
+      PAGAMENTOS.find((p) => p.id === pagamento)?.nome || "";
 
     router.push({
       pathname: "/dt-hr",
       params: {
         servico: nomeServico,
         pagamento: nomePagamento,
+        servico_id: String(servicoId),
+        valor: String(valorNum),
       },
     });
   }
@@ -123,7 +136,7 @@ const [pagamento, setPagamento] = useState<string | null>(null);
         <Text style={styles.subtitulo}>Qual tipo de manicure deseja?</Text>
 
         <View style={styles.cardsArea}>
-          {SERVICOS.map((servico) => {
+          {servicos.map((servico: any) => {
             const ativo = selecionado === servico.id;
             return (
               <View key={servico.id}>
@@ -140,8 +153,18 @@ const [pagamento, setPagamento] = useState<string | null>(null);
                   </View>
 
                   {!servico.subOpcoes ? (
-                    <View style={[styles.valorBadge, ativo && styles.valorBadgeAtivo]}>
-                      <Text style={[styles.valorTexto, ativo && styles.valorTextoAtivo]}>
+                    <View
+                      style={[
+                        styles.valorBadge,
+                        ativo && styles.valorBadgeAtivo,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.valorTexto,
+                          ativo && styles.valorTextoAtivo,
+                        ]}
+                      >
                         {servico.valor}
                       </Text>
                     </View>
@@ -156,19 +179,37 @@ const [pagamento, setPagamento] = useState<string | null>(null);
 
                 {ativo && servico.subOpcoes && (
                   <View style={styles.subArea}>
-                    {servico.subOpcoes.map((sub) => {
+                    {servico.subOpcoes.map((sub: any) => {
                       const subAtivo = subSelecionado === sub.id;
                       return (
                         <Pressable
                           key={sub.id}
-                          style={[styles.subCard, subAtivo && styles.subCardAtivo]}
+                          style={[
+                            styles.subCard,
+                            subAtivo && styles.subCardAtivo,
+                          ]}
                           onPress={() => setSubSelecionado(sub.id)}
                         >
-                          <Text style={[styles.subNome, subAtivo && styles.subNomeAtivo]}>
+                          <Text
+                            style={[
+                              styles.subNome,
+                              subAtivo && styles.subNomeAtivo,
+                            ]}
+                          >
                             {sub.nome}
                           </Text>
-                          <View style={[styles.valorBadge, subAtivo && styles.valorBadgeAtivo]}>
-                            <Text style={[styles.valorTexto, subAtivo && styles.valorTextoAtivo]}>
+                          <View
+                            style={[
+                              styles.valorBadge,
+                              subAtivo && styles.valorBadgeAtivo,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.valorTexto,
+                                subAtivo && styles.valorTextoAtivo,
+                              ]}
+                            >
                               {sub.valor}
                             </Text>
                           </View>
@@ -179,7 +220,7 @@ const [pagamento, setPagamento] = useState<string | null>(null);
                 )}
               </View>
             );
-          })} 
+          })}
         </View>
 
         {/* SEÇÃO DE PAGAMENTO */}
@@ -192,7 +233,10 @@ const [pagamento, setPagamento] = useState<string | null>(null);
             return (
               <Pressable
                 key={p.id}
-                style={[styles.pagamentoCard, ativo && styles.pagamentoCardAtivo]}
+                style={[
+                  styles.pagamentoCard,
+                  ativo && styles.pagamentoCardAtivo,
+                ]}
                 onPress={() => setPagamento(p.id)}
               >
                 <Ionicons
@@ -200,14 +244,18 @@ const [pagamento, setPagamento] = useState<string | null>(null);
                   size={22}
                   color={ativo ? "#fff" : "#2255a4"}
                 />
-                <Text style={[styles.pagamentoNome, ativo && styles.pagamentoNomeAtivo]}>
+                <Text
+                  style={[
+                    styles.pagamentoNome,
+                    ativo && styles.pagamentoNomeAtivo,
+                  ]}
+                >
                   {p.nome}
                 </Text>
               </Pressable>
             );
           })}
         </View>
-
       </ScrollView>
 
       <View style={styles.bottomArea}>

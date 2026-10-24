@@ -1,6 +1,6 @@
 //perfil cliente
-import React, { useState, useEffect } from "react";
-import { router, useLocalSearchParams } from "expo-router";
+import React, { useState, useEffect, useCallback } from "react";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { usuario } from "../../util/usuario";
 
 import {
@@ -11,8 +11,6 @@ import {
   ScrollView,
   TextInput,
 } from "react-native";
-
-//FAZER UM GET PUXANDO OS DADOS FORNECIDOS NO CADASTRO 
 
 import { Ionicons } from "@expo/vector-icons";
 
@@ -25,9 +23,22 @@ type Perfil = {
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const APIKEY = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
 
-export default function Perfil() {
+const estilosStatus: any = {
+  Pendente: { fundo: "#FFF3CD", cor: "#9A6700", icone: "time-outline" },
+  Confirmado: {
+    fundo: "#DDF4E4",
+    cor: "#1E7B3A",
+    icone: "checkmark-circle-outline",
+  },
+  Cancelado: {
+    fundo: "#FBE0E0",
+    cor: "#B3261E",
+    icone: "close-circle-outline",
+  },
+};
 
-const params = useLocalSearchParams();
+export default function Perfil() {
+  const params = useLocalSearchParams();
   const codCliente = params.cod_cliente as string;
 
   const [cliente, setCliente] = useState<Perfil>({
@@ -38,29 +49,85 @@ const params = useLocalSearchParams();
   const [editandoTelefone, setEditandoTelefone] = useState(false);
   const [telefoneTemp, setTelefoneTemp] = useState("");
 
-  const historico = [
+  useEffect(() => {
+    async function buscarTelefone() {
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/cadastro?id=eq.${usuario.id}&select=telefone`,
+          { headers: { apikey: APIKEY } },
+        );
+        const data = await response.json();
+        if (data[0]?.telefone)
+          setCliente((c) => ({ ...c, telefone: data[0].telefone }));
+      } catch (error) {
+        console.error("Erro ao buscar telefone:", error);
+      }
+    }
+    buscarTelefone();
+  }, []);
 
-    {
-      servico: "Alongamento Fibra",
-      data: "12/06/2026",
-    },
+  const [historico, setHistorico] = useState<any[]>([]);
 
-    {
-      servico: "Manutenção",
-      data: "28/05/2026",
-    },
+  useFocusEffect(
+    useCallback(() => {
+      async function buscarHistorico() {
+        try {
+          const [resAg, resServ] = await Promise.all([
+            fetch(
+              `${SUPABASE_URL}/rest/v1/agendamento?cliente_id=eq.${usuario.id}&select=servico_id,data,status&order=data.desc`,
+              { headers: { apikey: APIKEY } },
+            ),
+            fetch(`${SUPABASE_URL}/rest/v1/servico?select=id,nome`, {
+              headers: { apikey: APIKEY },
+            }),
+          ]);
+          const agendamentos = await resAg.json();
+          const servicos = await resServ.json();
+          if (!Array.isArray(agendamentos) || !Array.isArray(servicos)) {
+            console.log("Resposta do histórico:", agendamentos);
+            return;
+          }
+          setHistorico(
+            agendamentos.map((a: any) => {
+              const s = servicos.find((x: any) => x.id === a.servico_id);
+              const [ano, mes, dia] = a.data.split("-");
+              return {
+                servico: s ? s.nome : "Serviço",
+                data: `${dia}/${mes}/${ano}`,
+                status: a.status,
+              };
+            }),
+          );
+        } catch (error) {
+          console.error("Erro ao buscar histórico:", error);
+        }
+      }
+      buscarHistorico();
+    }, []),
+  );
 
-  ];
-
-  function salvarTelefone() {
-
-    setCliente({ ...cliente, telefone: telefoneTemp });
-
-    setEditandoTelefone(false);
+  async function salvarTelefone() {
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/cadastro?id=eq.${usuario.id}`,
+        {
+          method: "PATCH",
+          headers: { apikey: APIKEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ telefone: telefoneTemp }),
+        },
+      );
+      if (!response.ok) {
+        console.error(await response.text());
+        return;
+      }
+      setCliente({ ...cliente, telefone: telefoneTemp });
+      setEditandoTelefone(false);
+    } catch (error) {
+      console.error("Erro ao salvar telefone:", error);
+    }
   }
 
   function sair() {
-
     router.replace("/login");
   }
 
@@ -68,79 +135,37 @@ const params = useLocalSearchParams();
   const email = usuario.email;
 
   return (
-
     <ScrollView style={styles.container}>
-
-      <Text style={styles.titulo}>
-        Meu Perfil
-      </Text>
+      <Text style={styles.titulo}>Meu Perfil</Text>
 
       <View style={styles.cardPerfil}>
-
         <View style={styles.iconePerfil}>
-
-          <Text style={styles.letraPerfil}>
-           {nome?.[0]?.toUpperCase()}
-          </Text>
-
+          <Text style={styles.letraPerfil}>{nome?.[0]?.toUpperCase()}</Text>
         </View>
 
-        <Text style={styles.nome}>
-          {nome}
-        </Text>
+        <Text style={styles.nome}>{nome}</Text>
 
-        <Text style={styles.email}>
-          {email}
-        </Text>
-
+        <Text style={styles.email}>{email}</Text>
       </View>
 
       <View style={styles.cardInfo}>
-
         <View style={styles.linha}>
+          <Ionicons name="mail-outline" size={20} color="#27304D" />
 
-          <Ionicons
-            name="mail-outline"
-            size={20}
-            color="#27304D"
-          />
-
-          <Text style={styles.textoInfo}>
-            {email}
-          </Text>
-
+          <Text style={styles.textoInfo}>{email}</Text>
         </View>
 
         <View style={styles.linha}>
-
-          <Ionicons
-            name="call-outline"
-            size={20}
-            color="#27304D"
-          />
+          <Ionicons name="call-outline" size={20} color="#27304D" />
 
           {!editandoTelefone ? (
-
-            <TouchableOpacity
-              onPress={() =>
-                setEditandoTelefone(true)
-              }
-            >
-
+            <TouchableOpacity onPress={() => setEditandoTelefone(true)}>
               <Text style={styles.textoInfo}>
-
-                {cliente.telefone
-                  ? cliente.telefone
-                  : "Adicionar telefone"}
-
+                {cliente.telefone ? cliente.telefone : "Adicionar telefone"}
               </Text>
-
             </TouchableOpacity>
-
           ) : (
-
             <View style={styles.areaInput}>
-
               <TextInput
                 placeholder="Digite seu telefone"
                 value={telefoneTemp}
@@ -153,87 +178,58 @@ const params = useLocalSearchParams();
                 style={styles.botaoSalvar}
                 onPress={salvarTelefone}
               >
-
-                <Text style={styles.textoSalvar}>
-                  Salvar
-                </Text>
-
+                <Text style={styles.textoSalvar}>Salvar</Text>
               </TouchableOpacity>
-
             </View>
-
           )}
-
         </View>
-
       </View>
 
-      <Text style={styles.subtitulo}>
-        Histórico de Agendamentos
-      </Text>
+      <Text style={styles.subtitulo}>Histórico de Agendamentos</Text>
 
-      {historico.map((item, index) => (
-
-        <View
-          key={index}
-          style={styles.cardHistorico}
-        >
-
-          <Ionicons
-            name="calendar-outline"
-            size={22}
-            color="#27304D"
-          />
-
-          <View>
-
-            <Text style={styles.servico}>
-              {item.servico}
-            </Text>
-
-            <Text style={styles.data}>
-              {item.data}
-            </Text>
-
+      {historico.map((item, index) => {
+        const rotulo =
+          item.status === "Confirmado" || item.status === "Cancelado"
+            ? item.status
+            : "Pendente";
+        const est = estilosStatus[rotulo];
+        return (
+          <View key={index} style={styles.cardHistorico}>
+            <Ionicons name="calendar-outline" size={22} color="#27304D" />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.servico}>{item.servico}</Text>
+              <Text style={styles.data}>{item.data}</Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+                backgroundColor: est.fundo,
+                borderRadius: 12,
+                paddingVertical: 4,
+                paddingHorizontal: 10,
+              }}
+            >
+              <Ionicons name={est.icone} size={12} color={est.cor} />
+              <Text style={{ fontSize: 11, fontWeight: "700", color: est.cor }}>
+                {rotulo}
+              </Text>
+            </View>
           </View>
+        );
+      })}
 
-        </View>
-
-      ))}
-
-      <TouchableOpacity style={styles.botaoSenha}>
-
-        <Ionicons
-          name="lock-closed-outline"
-          size={20}
-          color="#27304D"
-        />
-
-        <Text style={styles.textoBotaoSenha}>
-          Alterar senha
-        </Text>
-
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.botaoSair}
-        onPress={sair}
-      >
-
-        <Text style={styles.textoSair}>
-          Sair
-        </Text>
-
+      <TouchableOpacity style={styles.botaoSair} onPress={sair}>
+        <Text style={styles.textoSair}>Sair</Text>
       </TouchableOpacity>
 
       <View style={{ height: 40 }} />
-
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: "#E9EDF8",
@@ -387,5 +383,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-
 });

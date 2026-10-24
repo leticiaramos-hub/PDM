@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -9,9 +8,12 @@ import {
   Share,
   Alert,
 } from "react-native";
-
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { usuario } from "../util/usuario";
+
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const APIKEY = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
 
 function gerarIdAgendamento(): string {
   const numero = Math.floor(1000 + Math.random() * 9000);
@@ -22,9 +24,7 @@ function gerarIdAgendamento(): string {
 function formatarData(dataStr: string): string {
   if (!dataStr) return "";
 
-  const [ano, mes, dia] = dataStr
-    .split("-")
-    .map(Number);
+  const [ano, mes, dia] = dataStr.split("-").map(Number);
 
   const data = new Date(ano, mes - 1, dia);
 
@@ -64,21 +64,82 @@ export default function Confirmacao() {
   const data = (params.data as string) ?? "";
   const horario = (params.horario as string) ?? "";
 
-  const servico =
-    (params.servico as string) ??
-    "Serviço não informado";
+  const servico = (params.servico as string) ?? "Serviço não informado";
 
-  const pagamento =
-    (params.pagamento as string) ??
-    "Não informado";
+  const pagamento = (params.pagamento as string) ?? "Não informado";
+  const servicoId = params.servico_id as string;
+  const valor = params.valor as string;
 
-  const [idAgendamento] =
-    useState(gerarIdAgendamento);
+  const [idAgendamento] = useState(gerarIdAgendamento);
+
+  const salvou = useRef(false);
+
+  useEffect(() => {
+    if (salvou.current) return;
+    salvou.current = true;
+
+    async function salvarAgendamento() {
+      const headers = {
+        apikey: APIKEY,
+        "Content-Type": "application/json",
+        Prefer: "return=representation",
+      };
+      try {
+        const reserva = await fetch(
+          `${SUPABASE_URL}/rest/v1/horario_disponivel?data=eq.${data}&hora=eq.${horario}&disponivel=eq.true`,
+          {
+            method: "PATCH",
+            headers,
+            body: JSON.stringify({ disponivel: false }),
+          },
+        );
+        const reservado = await reserva.json();
+        if (!reserva.ok || reservado.length === 0) {
+          Alert.alert(
+            "Horário indisponível",
+            "Esse horário acabou de ser reservado. Escolha outro.",
+          );
+          rota.back();
+          return;
+        }
+
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/agendamento`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            cliente_id: usuario.id,
+            servico_id: Number(servicoId),
+            data,
+            horario,
+            valor: Number(valor),
+            pagamento,
+            status: "Aguardando confirmação",
+          }),
+        });
+        if (!response.ok) {
+          console.error("Erro ao salvar agendamento:", await response.text());
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/horario_disponivel?id=eq.${reservado[0].id}`,
+            {
+              method: "PATCH",
+              headers,
+              body: JSON.stringify({ disponivel: true }),
+            },
+          );
+          Alert.alert("Erro", "Não foi possível salvar o agendamento.");
+          rota.back();
+        }
+      } catch (error) {
+        console.error("Erro ao salvar agendamento:", error);
+        Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+      }
+    }
+    salvarAgendamento();
+  }, []);
 
   const dataFormatada = formatarData(data);
 
-  const local =
-    "Rua Cícero Tomé de Araújo, 122 - Pocinhos, PB";
+  const local = "Rua Cícero Tomé de Araújo, 122 - Pocinhos, PB";
 
   async function compartilhar() {
     try {
@@ -92,36 +153,21 @@ export default function Confirmacao() {
           `Local: ${local}`,
       });
     } catch {
-      Alert.alert(
-        "Erro",
-        "Não foi possível compartilhar."
-      );
+      Alert.alert("Erro", "Não foi possível compartilhar.");
     }
   }
 
-  function ItemInfo(
-    icone: any,
-    titulo: string,
-    valor: string
-  ) {
+  function ItemInfo(icone: any, titulo: string, valor: string) {
     return (
       <View style={styles.cardLinha}>
         <View style={styles.cardIcone}>
-          <Ionicons
-            name={icone}
-            size={18}
-            color="#7B84A6"
-          />
+          <Ionicons name={icone} size={18} color="#7B84A6" />
         </View>
 
         <View style={{ flex: 1 }}>
-          <Text style={styles.cardItemLabel}>
-            {titulo}
-          </Text>
+          <Text style={styles.cardItemLabel}>{titulo}</Text>
 
-          <Text style={styles.cardItemValor}>
-            {valor}
-          </Text>
+          <Text style={styles.cardItemValor}>{valor}</Text>
         </View>
       </View>
     );
@@ -129,9 +175,7 @@ export default function Confirmacao() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.headerTitulo}>
-        Confirmação
-      </Text>
+      <Text style={styles.headerTitulo}>Confirmação</Text>
 
       <View style={styles.etapas}>
         <View style={styles.etapaPonto} />
@@ -142,17 +186,11 @@ export default function Confirmacao() {
 
       <View style={styles.iconeContainer}>
         <View style={styles.iconeCirculo}>
-          <Ionicons
-            name="checkmark"
-            size={32}
-            color="#9b6b6e"
-          />
+          <Ionicons name="checkmark" size={32} color="#9b6b6e" />
         </View>
       </View>
 
-      <Text style={styles.titulo}>
-        Agendamento Confirmado!
-      </Text>
+      <Text style={styles.titulo}>Agendamento Confirmado!</Text>
 
       <Text style={styles.subtitulo}>
         Seu horário foi reservado com sucesso
@@ -165,63 +203,37 @@ export default function Confirmacao() {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardLabel}>
-          ID DO AGENDAMENTO
-        </Text>
+        <Text style={styles.cardLabel}>ID DO AGENDAMENTO</Text>
 
-        <Text style={styles.cardId}>
-          {idAgendamento}
-        </Text>
+        <Text style={styles.cardId}>{idAgendamento}</Text>
 
         <View style={styles.divisor} />
 
         {ItemInfo(
           "calendar-outline",
           "Data & Hora",
-          `${dataFormatada} às ${horario}`
+          `${dataFormatada} às ${horario}`,
         )}
 
-        {ItemInfo(
-          "sparkles-outline",
-          "Serviço",
-          servico
-        )}
+        {ItemInfo("sparkles-outline", "Serviço", servico)}
 
-        {ItemInfo(
-          "card-outline",
-          "Pagamento",
-          pagamento
-        )}
+        {ItemInfo("card-outline", "Pagamento", pagamento)}
 
-        {ItemInfo(
-          "location-outline",
-          "Local",
-          local
-        )}
+        {ItemInfo("location-outline", "Local", local)}
       </View>
 
       <Text style={styles.avisoTexto}>
-        Você receberá confirmação do
-        agendamento
+        Você receberá confirmação do agendamento
       </Text>
 
       <TouchableOpacity
         style={styles.botaoPrimario}
-<<<<<<< HEAD
-        onPress={() => rota.push("/index" as any)}
-=======
-        onPress={() => rota.push("/tabs/home" as any)}
->>>>>>> 66b3337a201c255a29dd1460fc0179479721837d
+        onPress={() => rota.push("/tabs" as any)}
       >
-        <Text style={styles.botaoPrimarioTexto}>
-          Voltar ao Início
-        </Text>
+        <Text style={styles.botaoPrimarioTexto}>Voltar ao Início</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.botaoSecundario}
-        onPress={compartilhar}
-      >
+      <TouchableOpacity style={styles.botaoSecundario} onPress={compartilhar}>
         <Text style={styles.botaoSecundarioTexto}>
           Compartilhar Agendamento
         </Text>

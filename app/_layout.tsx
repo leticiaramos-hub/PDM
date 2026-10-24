@@ -51,19 +51,7 @@ export default function RootLayout() {
       <Stack.Screen
         name="confirmacao"
         options={{
-          title: "Confirmação",
-        }}
-      />
-      <Stack.Screen
-        name="dt-hr"
-        options={{
-          headerShown: false
-        }}
-      />
-      <Stack.Screen
-        name="confirmacao"
-        options={{
-          headerShown: false
+          headerShown: false,
         }}
       />
     </Stack>

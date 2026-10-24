@@ -40,6 +40,7 @@ export default function Login() {
       );
 
       const data = await response.json();
+      console.log("Resposta do login:", data);
 
       if (!response.ok) {
         if (data.error_code === "email_not_confirmed") {
@@ -54,10 +55,9 @@ export default function Login() {
       usuario.nome = nome;
       usuario.email = data.user.email;
       usuario.id = data.user.id;
-      console.log("ID do usuário:", usuario.id);
 
       router.replace({
-        pathname: "/",
+        pathname: "/tabs",
         params: { nome, email: data.user.email },
       });
     } catch (error) {
@@ -65,14 +65,6 @@ export default function Login() {
       Alert.alert("Erro", "Não foi possível conectar ao servidor.");
     }
   }
-<<<<<<< HEAD
-=======
-  router.replace({
-    pathname: "/tabs/home",
-    params: { email },
-  });
-}
->>>>>>> 66b3337a201c255a29dd1460fc0179479721837d
 
   return (
     <SafeAreaView style={styles.safeArea}>

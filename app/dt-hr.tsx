@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -6,7 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native"
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -54,6 +54,9 @@ LocaleConfig.locales["pt-br"] = {
   today: "Hoje",
 };
 
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const APIKEY = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
+
 LocaleConfig.defaultLocale = "pt-br";
 
 export default function DataHora() {
@@ -62,11 +65,41 @@ export default function DataHora() {
 
   const servico = (params.servico as string) || "Não informado";
   const pagamento = (params.pagamento as string) || "Não informado";
+  const servicoId = params.servico_id as string;
+  const valor = params.valor as string;
 
   const [dataSelecionada, setDataSelecionada] = useState("");
   const [horarioSelecionado, setHorarioSelecionado] = useState("");
+  const [livres, setLivres] = useState<any[]>([]);
 
-  const horarios = ["08:30", "13:00", "14:00"];
+  console.log("Horários:", livres.length);
+
+  useEffect(() => {
+    async function buscarHorarios() {
+      try {
+        const hoje = new Date().toISOString().split("T")[0];
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/horario_disponivel?data=gte.${hoje}&order=data,hora`,
+          { headers: { apikey: APIKEY } },
+        );
+        setLivres(await response.json());
+      } catch (error) {
+        console.error("Erro ao buscar horários:", error);
+      }
+    }
+    buscarHorarios();
+  }, []);
+
+  const minutos = (hora: string) =>
+    Number(hora.slice(0, 2)) * 60 + Number(hora.slice(3, 5));
+  const doDia = livres.filter((h) => h.data === dataSelecionada);
+  const ocupados = doDia.filter((h) => !h.disponivel);
+  const horarios = doDia.map((h) => ({
+    hora: h.hora.slice(0, 5),
+    bloqueado:
+      !h.disponivel ||
+      ocupados.some((o) => Math.abs(minutos(o.hora) - minutos(h.hora)) < 90),
+  }));
 
   function continuar() {
     if (!dataSelecionada || !horarioSelecionado) {
@@ -80,23 +113,14 @@ export default function DataHora() {
         horario: horarioSelecionado,
         servico: servico,
         pagamento: pagamento,
+        servico_id: servicoId,
+        valor: valor,
       },
     });
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-<<<<<<< HEAD
-=======
-
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => rota.replace("/tabs/servico")} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={24} color="#1a3a5c" />
-        </TouchableOpacity>
-        <Text style={styles.topTitle}>Agendar Horário</Text>
-      </View>
-
->>>>>>> 66b3337a201c255a29dd1460fc0179479721837d
       <ScrollView style={styles.container}>
         <View style={styles.accentBar} />
         <Text style={styles.titulo}>Data & Hora</Text>
@@ -106,6 +130,7 @@ export default function DataHora() {
           minDate={new Date().toISOString().split("T")[0]}
           onDayPress={(dia) => {
             setDataSelecionada(dia.dateString);
+            setHorarioSelecionado("");
           }}
           markedDates={{
             [dataSelecionada]: {
@@ -129,24 +154,25 @@ export default function DataHora() {
         <Text style={styles.horarioTitulo}>Horários disponíveis</Text>
 
         <View style={styles.gradeHorarios}>
-          {horarios.map((horario) => (
+          {horarios.map((h) => (
             <TouchableOpacity
-              key={horario}
+              key={h.hora}
+              disabled={h.bloqueado}
               style={[
                 styles.botaoHorario,
-                horarioSelecionado === horario &&
-                  styles.botaoHorarioSelecionado,
+                horarioSelecionado === h.hora && styles.botaoHorarioSelecionado,
+                h.bloqueado && styles.botaoHorarioBloqueado,
               ]}
-              onPress={() => setHorarioSelecionado(horario)}
+              onPress={() => setHorarioSelecionado(h.hora)}
             >
               <Text
                 style={[
                   styles.textoHorario,
-                  horarioSelecionado === horario &&
+                  horarioSelecionado === h.hora &&
                     styles.textoHorarioSelecionado,
                 ]}
               >
-                {horario}
+                {h.hora}
               </Text>
             </TouchableOpacity>
           ))}
@@ -235,6 +261,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#2255a4",
   },
+
+  botaoHorarioBloqueado: {
+    opacity: 0.4,
+  },
+
   textoHorario: {
     color: "#1a2f5e",
     fontWeight: "600",

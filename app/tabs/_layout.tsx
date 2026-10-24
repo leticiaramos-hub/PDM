@@ -14,7 +14,6 @@ export default () => {
               size={size}
               color={color}
             />
-<<<<<<< HEAD:app/(tabs)/_layout.tsx
           ),
           headerShown: false,
         }}
@@ -28,22 +27,6 @@ export default () => {
               name={focused ? "calendar" : "calendar-outline"}
               size={size}
               color={color}
-=======
-            <Tabs.Screen 
-                name="servico" 
-                options={{ 
-                    title: "Agenda",
-                    href: null,
-                    tabBarIcon: ({ color, size, focused }) => (
-                        <Ionicons
-                            name={focused ? 'calendar' : 'calendar-outline'} 
-                            size={size} 
-                            color={color} 
-                        />
-                    ),                    
-                    headerShown: false
-                }} 
->>>>>>> 66b3337a201c255a29dd1460fc0179479721837d:app/tabs/_layout.tsx
             />
           ),
           headerShown: false,
